@@ -27,4 +27,12 @@ router.route("/").get(authMiddleware.authMiddleware, accountController.getUserAc
 
 router.route("/balance/:accountId").get(authMiddleware.authMiddleware, accountController.getAccountBalance);
 
+/**
+ * - GET /api/accounts/all
+ * - Get all accounts except system accounts
+ * - Protected Route
+ */
+
+router.route("/all").get(authMiddleware.authMiddleware, accountController.getAllAccountsExceptSystem);
+
 module.exports = router;

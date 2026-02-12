@@ -56,10 +56,23 @@ async function getAccountBalance(req, res) {
             error: error.message
         });
     }
+};
+
+async function getAllAccountsExceptSystem(req, res) {
+    try {
+        const accounts = await Account.find({isSystemAccount: false});
+        return res.status(200).json({accounts });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        });
+    }
 }
 
 module.exports = {
     createAccount,
     getUserAccounts,
-    getAccountBalance
+    getAccountBalance,
+    getAllAccountsExceptSystem
 }
