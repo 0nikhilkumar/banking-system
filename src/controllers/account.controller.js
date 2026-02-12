@@ -20,7 +20,7 @@ async function createAccount(req, res) {
 
 async function getUserAccounts(req, res) {
     try {
-        const accounts = await Account.find({user: req.user._id});
+        const accounts = await Account.find({ user: req.user._id });
         return res.status(200).json({
             accounts
         });
@@ -36,9 +36,9 @@ async function getAccountBalance(req, res) {
     const { accountId } = req.params;
 
     try {
-        const account = await Account.findOne({_id: accountId, user: req.user._id});
+        const account = await Account.findOne({ _id: accountId, user: req.user._id });
 
-        if(!account) {
+        if (!account) {
             return res.status(404).json({
                 message: "Account not found"
             });
@@ -60,8 +60,17 @@ async function getAccountBalance(req, res) {
 
 async function getAllAccountsExceptSystem(req, res) {
     try {
-        const accounts = await Account.find({isSystemAccount: false});
-        return res.status(200).json({accounts });
+        const accounts = await Account.find()
+            .populate({
+                path: 'user',
+                match: { systemUser: false },
+                select: '+systemUser'
+            });
+
+        // Filter out accounts where user is null (systemUser: true)
+        const filteredAccounts = accounts.filter(account => account.user !== null);
+
+        return res.status(200).json({ accounts: filteredAccounts });
     } catch (error) {
         return res.status(500).json({
             message: "Internal server error",
