@@ -88,7 +88,7 @@ async function getAllAccountsExceptSystem(req, res) {
             {
                 $project: {
                     _id: 1,
-                    userName: "$userDetails.name"
+                    name: "$userDetails.name"
                 }
             }
         ]);
