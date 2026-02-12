@@ -1,4 +1,5 @@
 const Account = require('../models/account.model.js');
+const User = require('../models/user.model.js');
 
 async function createAccount(req, res) {
     try {
@@ -60,17 +61,39 @@ async function getAccountBalance(req, res) {
 
 async function getAllAccountsExceptSystem(req, res) {
     try {
-        const accounts = await Account.find()
-            .populate({
-                path: 'user',
-                match: { systemUser: false },
-                select: '+systemUser'
-            });
+        const currentUserId = req.user._id;
 
-        // Filter out accounts where user is null (systemUser: true)
-        const filteredAccounts = accounts.filter(account => account.user !== null);
+        const accounts = await Account.aggregate([
+            {
+                $match: {
+                    user: { $ne: currentUserId }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            {
+                $unwind: "$userDetails"
+            },
+            {
+                $match: {
+                    "userDetails.systemUser": false
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    userName: "$userDetails.name"
+                }
+            }
+        ]);
 
-        return res.status(200).json({ accounts: filteredAccounts });
+        return res.status(200).json({ accounts: accounts });
     } catch (error) {
         return res.status(500).json({
             message: "Internal server error",
