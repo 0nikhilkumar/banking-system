@@ -13,4 +13,7 @@ router.route("/login").post(authController.userLogin);
 /* POST /api/auth/logout */
 router.route("/logout").post(authController.userLogout);
 
+/* GET /api/auth/profile */
+router.route("/system").get(authMiddleware, authController.checkSystem);
+
 module.exports = router;

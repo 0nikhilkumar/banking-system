@@ -113,8 +113,27 @@ const userLogout = async (req, res) => {
         });
     }
 
-}
+};
+
+/**
+* - user profile controller
+* - GET /api/auth/profile
+*/
+const checkSystem = async (req, res) => {
+    try {
+        // req.user should be set by auth.middleware.js after JWT verification
+        const { id } = req.user;
+
+        const user = await User.findById(id).select("+systemUser");
+        let genUser = false;
+        if(user.systemUser) {
+            genUser = true;
+        }
+        return res.status(200).json({ id: user._id, genUser});
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
 
 module.exports = {
-    userRegister, userLogin, userLogout
-}
+    userRegister, userLogin, userLogout, checkSystem}
