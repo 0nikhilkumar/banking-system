@@ -37,7 +37,7 @@ const userRegister = async (req, res) => {
             },
             token
         });
-        await emailService.sendRegistrationEmail(user.email, user.name);
+        // await emailService.sendRegistrationEmail(user.email, user.name);
     } catch (error) {
         console.log(error);
     }
